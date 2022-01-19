@@ -32,20 +32,3 @@ for raster in rasters_list:
                       srcNodata = -3.4e+38,
                      dstNodata = -9999)
     warp = None # Closes the files
-
-#-----------------------------------------------------------------------------------------------------------#
-
-# path_to_shps = "D:/OneDrive - University of Idaho/MagicValleyData/Eastern_snake_plains_field_boundary_layers/"
-
-# path_to_write_shps = "D:/OneDrive - University of Idaho/MagicValleyData/magicvalley_field_boundries/"
-
-# fieldboundries_list = glob.glob(path_to_shps + '/**/*.gdb', recursive=True)
-
-# for shp in fieldboundries_list:
-#     print(shp)
-#     shpname = shp.rsplit('\\',1)[1].rsplit('.', 1)[0]
-#     print(shpname)
-#     bdlyr=gpd.read_file(shp,layer= shpname)
-#     output_layer = path_to_write_shps + shpname + ".shp"
-#     clippedshp = gpd.clip(bdlyr, magicValleymask)
-#     clippedshp.to_file(output_layer)

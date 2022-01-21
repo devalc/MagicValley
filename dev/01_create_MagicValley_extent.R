@@ -1,8 +1,8 @@
 ## --------------------------------------------------------------------------------------##
 ##
-## Script name: create_project_extent.R
+## Script name: 01_create_MagicValley_extent.R
 ##
-## Purpose of the script: Create a boundry layer for magic valley which will be used to define
+## Purpose of the script: Create a boundary layer for magic valley which will be used to define
 ## the processing
 ##
 ## Author: Chinmay Deval

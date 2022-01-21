@@ -1,6 +1,6 @@
 ## --------------------------------------------------------------------------------------##
 ##
-## Script name: 05_dominant_crop_cover_magic_valley_dynamic_field_boundries.R
+## Script name: 04_dominant_crop_cover_magic_valley_dynamic_field_boundries.R
 ##
 ## Purpose of the script: Identify dominant crop cover in each polygon
 ##
@@ -59,25 +59,25 @@ cropscape2020 <- raster::raster('D:/OneDrive - University of Idaho/MagicValleyDa
 
 
 
-fields2006 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2006_only_irrigated_fields.shp",
+fields2006 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2006_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2008 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2008_only_irrigated_fields.shp",
+fields2008 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2008_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2009 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2009_only_irrigated_fields.shp",
+fields2009 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2009_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2010 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2010_only_irrigated_fields.shp",
+fields2010 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2010_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2011 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2011_only_irrigated_fields.shp",
+fields2011 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2011_only_irrigated_fields.shp",
                      quiet = TRUE)
-fields2012 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2012_only_irrigated_fields.shp",
+fields2012 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2012_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2013 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2013_only_irrigated_fields.shp",
+fields2013 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2013_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2014 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2014_only_irrigated_fields.shp",
+fields2014 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2014_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2015 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2015_only_irrigated_fields.shp",
+fields2015 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2015_only_irrigated_fields.shp",
                           quiet = TRUE)
-fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2016_only_irrigated_fields.shp",
+fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2016_only_irrigated_fields.shp",
                           quiet = TRUE)
 ## --------------------------------------------------------------------------------------##
 

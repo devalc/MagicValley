@@ -1,6 +1,6 @@
 ## --------------------------------------------------------------------------------------##
 ##
-## Script name: 06_dominant_crop_cover_magic_valley_with_fixed_field_boundries.R
+## Script name: 05_dominant_crop_cover_magic_valley_with_fixed_field_boundries.R
 ##
 ## Purpose of the script: Identify dominant crop cover in each polygon assuming field polygons of year 2016
 ##
@@ -40,7 +40,7 @@ raster_list <- list.files("D:/OneDrive - University of Idaho/MagicValleyData/Cro
                           pattern = "\\.tif$",full.names = TRUE)
 
 
-fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/magic_valley_field_boundries_wgs84/Irrigated_fields_only_wgs84/IrrigatedLands_2016_only_irrigated_fields.shp",
+fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigated_fields_in_magic_valley_wgs84/IrrigatedLands_2016_only_irrigated_fields.shp",
                           quiet = TRUE)
 
 ## --------------------------------------------------------------------------------------##
@@ -59,4 +59,5 @@ for (ras in raster_list){
 }
 
 
-sf::st_write(df, "D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_2005_to_2020_with_2016_field_boundry/dominant_crop_cover_2005_to_2020_with_2016_field_boundry.shp")
+sf::st_write(df, "D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/dominant_crop_cover_2005_to_2020_with_2016_field_boundry.shp")
+qs::qsave(df, "D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/dominant_crop_cover_2005_to_2020_with_2016_field_boundry.qs")

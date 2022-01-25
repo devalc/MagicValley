@@ -77,6 +77,8 @@ r.t95 <- raster::stack(data[[1]],data[[1]], data[[1]])
 values(r.t95) <- as.matrix(datadf_with_stats[,c('persistance_95', 'difference_class', 'dif_perc_class')])
 
 
+
+
 raster::writeRaster(r.t95,
                     paste0("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/", "persistence_at_95_magicValley_1986_2020.tif"),
                     overwrite=TRUE,options=c("COMPRESS=LZW"))

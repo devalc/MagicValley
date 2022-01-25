@@ -32,7 +32,7 @@ library(CropScapeR)
 #--- load the crop code reference data ---#
 data("linkdata")
 
-# linkdata
+linkdata
 
 ## --------------------------------------------------------------------------------------##
 
@@ -46,16 +46,32 @@ fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irr
 ## --------------------------------------------------------------------------------------##
 ##  Assuming a constant field boundary: the latest one from 2016 for the entire timeseries
 ## --------------------------------------------------------------------------------------##
-df = data.frame()
+# df = data.frame()
+
+yr1 = stringr::str_split(raster_list[1], pattern = "_")[[1]][5]
+rasin1 = raster::raster(raster_list[1])
+df= fields2016 %>% dplyr::mutate(MasterCat= exact_extract(rasin1, fields2016, 'mode', progress = TRUE))%>% 
+  dplyr::left_join(linkdata, by ="MasterCat")
+
+colnames(df)[8] = paste0("Crop_", yr1)
+
+df = df %>% dplyr::select(-c(Shp_Lng, Shap_Ar, ACRES, FID_1))
+
+
+raster_list = raster_list[2:15]
+
 
 for (ras in raster_list){
   yr = stringr::str_split(ras, pattern = "_")[[1]][5]
   rasin = raster::raster(ras)
-  df1= fields2016 %>% dplyr::mutate(MasterCat= exact_extract(rasin, fields2016, 'mode', progress = TRUE),
-                                            Year = lubridate::year(as.Date(yr, format = "%Y")))%>% 
-     dplyr::left_join(linkdata, by ="MasterCat") %>% dplyr::select(-c(Shp_Lng, Shap_Ar))
- 
-  df = rbind(df, df1) 
+  df1= fields2016 %>% dplyr::mutate(MasterCat= exact_extract(rasin, fields2016, 'mode', progress = TRUE))%>% 
+     dplyr::left_join(linkdata, by ="MasterCat") 
+  
+  colnames(df1)[8] = paste0("Crop_", yr)
+  
+  df1 = df1 %>% dplyr::select(-c(Shp_Lng, Shap_Ar, ACRES, FID_1,IRRI_ST ,MasterCat))%>% as.data.frame()
+  
+  df = dplyr::left_join(df, df1, by=c("FID", "geometry"))
 }
 
 

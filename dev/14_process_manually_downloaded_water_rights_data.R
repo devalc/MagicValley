@@ -47,14 +47,14 @@ df = sf::st_join(water_rights_for_magic_valley, left = FALSE, fields2016['FID'])
   dplyr::mutate(source = dplyr::case_when(Source == 'GROUND WATER' ~ "Groundwater",
                                           stringr::str_ends(Source, "SPRING") ~ "Spring", 
                                           TRUE  ~ "Surfacewater"))%>% 
-  dplyr::mutate(WR_class = dplyr::case_when(PriorityDa <= '1985-12-31' ~ "Senior_WaterRight",
+  dplyr::mutate(WR_class = dplyr::case_when(PriorityDa <= '1935-12-31' ~ "Senior_WaterRight",
                                           TRUE  ~ "Junior_WaterRight"))%>% 
   dplyr::mutate(RDR_classs = dplyr::case_when(OverallMax <= 10 ~ "low",
                                               dplyr::between(OverallMax, 10.01,500) ~ "medium",
                                               dplyr::between(OverallMax, 500.01,1500) ~ "high",
                                               dplyr::between(OverallMax, 1500.01, 3000) ~ "very_high"
                                               ))%>% dplyr::select(-c(Source, Status))
-
+## low 0-2, med = 2-3, 3-6 high, >6 very high
 df1 = df %>%
 as.data.frame()%>% dplyr::select(-geometry)
  

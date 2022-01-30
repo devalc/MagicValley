@@ -40,6 +40,7 @@ fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irr
 ##  Assuming a constant field boundary: the latest one from 2016 to extract the properties 
 ## --------------------------------------------------------------------------------------##               
 
+### change to range!
 
 df1= fields2016 %>% 
   dplyr::mutate(depthtobedrockmin= exact_extract(depthtobedrockmin, fields2016, 'mode', progress = TRUE))%>%

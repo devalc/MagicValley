@@ -38,7 +38,7 @@ library(qs)
 ET_persistence = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/field_stats/field_perisitance_stats_magick_valley.shp")
 WR_stats = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Water_Rights_PODs/field_stats/water_rights_info_appeneded_to_2016_field_boundries.shp")
 soils_stats = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/gSSURGO_ID_data/field_stats/gSURRGO_soils_field_stats.shp")
-
+#elevation
 
 WR_stats = WR_stats %>% as.data.frame()%>% dplyr::select(FID,
                                                          PriorityDa,

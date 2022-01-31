@@ -1,0 +1,377 @@
+---
+title: "Summary ET Persistence"
+date: "`r Sys.Date()`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: axist
+    mathjax: default
+    use_fontawesome: true
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(sf)
+library(raster)
+library(qs)
+library(leaflet)
+library(mapview)
+library(echarts4r)
+```
+
+
+```{r, echo=FALSE}
+fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/field_boundaries_with_all_stats.qs")
+
+
+WR_points = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/Water_Rights_PODs/field_stats/water_rights_info_processed_points.qs")
+
+fields_with_one_crop = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/one_dominant_crop_over_entire_ts.qs")
+
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields_with_one_crop = fields_with_one_crop%>% as.data.frame() %>% dplyr::select(FID, Crop)
+
+fields = fields %>% dplyr::left_join(fields_with_one_crop, by = c("FID"))
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+colnames(fields)
+```
+
+
+## Elevation difference 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, elvtn_m_d) %>% 
+  drop_na() %>% ggplot(aes(elvtn_m_d, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+###  ET Persistence & Elevation difference. Color coded by water rights.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, elvtn_m_d,WR_class) %>% 
+  drop_na() %>% ggplot(aes(elvtn_m_d, Prsstn_, color = WR_class))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~WR_class)+ ggpubr::stat_cor(method = "pearson", label.x = 100, label.y = 100)
+
+```
+
+
+###  ET Persistence & Elevation difference. color coded by rate of diversion.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, elvtn_m_d,RDR_classs) %>% 
+  drop_na() %>% ggplot(aes(elvtn_m_d, Prsstn_, color = RDR_classs))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~RDR_classs)+ ggpubr::stat_cor(method = "pearson", label.x = 100, label.y = 100)
+
+```
+
+
+###  ET Persistence & Elevation difference. Color coded by source.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, elvtn_m_d,source) %>% 
+  drop_na() %>% ggplot(aes(elvtn_m_d, Prsstn_, color = source))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~source)+ ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+## ET Persistence & Elevation difference. Color coded by crop
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, elvtn_m_d,Crop) %>% 
+  drop_na() %>% ggplot(aes(elvtn_m_d, Prsstn_, color = Crop))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Crop)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 250)+ggthemes::theme_wsj()+theme(legend.position = "None")+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+```
+
+## Slope difference 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, slp_dg_d) %>% 
+  drop_na() %>% ggplot(aes(slp_dg_d, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+
+
+## ET Persistence & Slope difference. Color coded by water rights.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, slp_dg_d,WR_class) %>% 
+  drop_na() %>% ggplot(aes(slp_dg_d, Prsstn_, color = WR_class))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~WR_class)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+## ET Persistence & Slope difference. Color coded by rate of diversion class.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, slp_dg_d,RDR_classs) %>% 
+  drop_na() %>% ggplot(aes(slp_dg_d, Prsstn_, color = RDR_classs))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~RDR_classs)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+
+
+## ET Persistence & Slope difference. Color coded by source.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, slp_dg_d,source) %>% 
+  drop_na() %>% ggplot(aes(slp_dg_d, Prsstn_, color = source))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~source)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 120)
+
+```
+
+
+
+## ET Persistence & Slope difference. Color coded by crop
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, slp_dg_d,Crop) %>% 
+  drop_na() %>% ggplot(aes(slp_dg_d, Prsstn_, color = Crop))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Crop)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 250)+ggthemes::theme_wsj()+theme(legend.position = "None")+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+```
+
+## OverallMax
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, OverallMax) %>% 
+  drop_na() %>% ggplot(aes(OverallMax, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+
+
+## ET Persistence & OverallMax. Color coded by water rights.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, OverallMax,WR_class) %>% 
+  drop_na() %>% ggplot(aes(OverallMax, Prsstn_, color = WR_class))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~WR_class)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+## ET Persistence & OverallMax. Color coded by rate of diversion class.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, OverallMax,RDR_classs) %>% 
+  drop_na() %>% ggplot(aes(OverallMax, Prsstn_, color = RDR_classs))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~RDR_classs)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+
+
+## ET Persistence & OverallMax. Color coded by source.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, OverallMax,source) %>% 
+  drop_na() %>% ggplot(aes(OverallMax, Prsstn_, color = source))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~source)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 120)
+
+```
+
+
+
+## ET Persistence & OverallMax. Color coded by crop
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, OverallMax,Crop) %>% 
+  drop_na() %>% ggplot(aes(OverallMax, Prsstn_, color = Crop))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Crop)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 250)+ggthemes::theme_wsj()+theme(legend.position = "None")+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+```
+
+## bdrck_d
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, bdrck_d) %>% 
+  drop_na() %>% ggplot(aes(bdrck_d, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+
+
+## ET Persistence & bdrck_d Color coded by water rights.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, bdrck_d,WR_class) %>% 
+  drop_na() %>% ggplot(aes(bdrck_d, Prsstn_, color = WR_class))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~WR_class)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+## ET Persistence & bdrck_d Color coded by rate of diversion class.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, bdrck_d,RDR_classs) %>% 
+  drop_na() %>% ggplot(aes(bdrck_d, Prsstn_, color = RDR_classs))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~RDR_classs)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+
+
+## ET Persistence & bdrck_d Color coded by source.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, bdrck_d,source) %>% 
+  drop_na() %>% ggplot(aes(bdrck_d, Prsstn_, color = source))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~source)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 120)
+
+```
+
+
+## ET Persistence & bdrck_d Color coded by crop
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, bdrck_d,Crop) %>% 
+  drop_na() %>% ggplot(aes(bdrck_d, Prsstn_, color = Crop))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Crop)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 250)+ggthemes::theme_wsj()+theme(legend.position = "None")+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+```
+
+
+## twc_dff
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, twc_dff) %>% 
+  drop_na() %>% ggplot(aes(twc_dff, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)
+
+```
+
+
+
+## ET Persistence & twc_dff. Color coded by water rights.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, twc_dff,WR_class) %>% 
+  drop_na() %>% ggplot(aes(twc_dff, Prsstn_, color = WR_class))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~WR_class)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+## ET Persistence & twc_dff. Color coded by rate of diversion class.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, twc_dff,RDR_classs) %>% 
+  drop_na() %>% ggplot(aes(twc_dff, Prsstn_, color = RDR_classs))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~RDR_classs)+ ggpubr::stat_cor(method = "pearson", label.x = 10, label.y = 120)
+
+```
+
+
+
+
+## ET Persistence & twc_dff. Color coded by source.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, twc_dff,source) %>% 
+  drop_na() %>% ggplot(aes(twc_dff, Prsstn_, color = source))+ 
+  geom_point(alpha=0.25, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~source)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 120)+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+
+```
+
+
+## ET Persistence & twc_dff. Color coded by crop
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, twc_dff,Crop) %>% 
+  drop_na() %>% ggplot(aes(twc_dff, Prsstn_, color = Crop))+ 
+  geom_point(alpha=0.5, size=2)+
+  geom_smooth(method = "lm")+
+  facet_wrap(~Crop)+ ggpubr::stat_cor(method = "pearson", label.x = 5, label.y = 250)+ggthemes::theme_wsj()+theme(legend.position = "None")+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+```
+
+
+## sndc_df (Looks like something went wrong with the sand content layer.)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+fields %>% dplyr::select(Prsstn_, sndc_df) %>% 
+  drop_na() %>% ggplot(aes(sndc_df, Prsstn_))+ 
+  geom_point(alpha=0.5, size=2)+ 
+  geom_smooth(method = "lm")+
+  ggpubr::stat_cor(method = "pearson", label.x = 20, label.y = 120)+ggthemes::theme_fivethirtyeight()+theme(legend.position = "None")
+
+
+
+```
+
+
+
+
+
+

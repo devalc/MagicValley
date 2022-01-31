@@ -43,10 +43,36 @@ fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irr
 ### change to range!
 
 df1= fields2016 %>% 
-  dplyr::mutate(depthtobedrockmin= exact_extract(depthtobedrockmin, fields2016, 'mode', progress = TRUE))%>%
-  dplyr::mutate(twac0150= exact_extract(twac0150, fields2016, 'mode', progress = TRUE))%>%
-  dplyr::mutate(totalsandcont= exact_extract(totalsandcont, fields2016, 'mode', progress = TRUE))
+  dplyr::mutate(bedrck_min= exact_extract(depthtobedrockmin, 
+                                           fields2016, 'min',
+                                           progress = TRUE),
+                bedrck_max= exact_extract(depthtobedrockmin, 
+                                           fields2016, 'max',
+                                           progress = TRUE),
+                bedrck_diff= bedrck_max - bedrck_min,
+                twac_min= exact_extract(twac0150,
+                                            fields2016, 'min',
+                                            progress = TRUE),
+                twac_max= exact_extract(twac0150,
+                                            fields2016, 'max',
+                                            progress = TRUE),
+                twac_diff= twac_max - twac_min,
+                sandc_min= exact_extract(totalsandcont,
+                                            fields2016, 'min',
+                                            progress = TRUE),
+                sandc_max= exact_extract(totalsandcont,
+                                            fields2016, 'max',
+                                            progress = TRUE),
+                sandc_diff= sandc_max - sandc_min
+                )
+
 
 df1 = df1 %>%   sf::st_transform(CRS("+init=epsg:4326")) 
 
-sf::st_write(df1, "D:/OneDrive - University of Idaho/MagicValleyData/gSSURGO_ID_data/field_stats/gSURRGO_soils_field_stats.shp")
+
+sf::st_write(df1, 
+             "D:/OneDrive - University of Idaho/MagicValleyData/gSSURGO_ID_data/field_stats/gSURRGO_soils_field_stats.shp")
+
+
+qs::qsave(df1, 
+             "D:/OneDrive - University of Idaho/MagicValleyData/gSSURGO_ID_data/field_stats/gSURRGO_soils_field_stats.qs")

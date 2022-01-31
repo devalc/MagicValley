@@ -42,15 +42,11 @@ thematic_shiny(font = "auto")
 
 ## --------------------------------------------------------------------------------------##
 tictoc::tic()
-data <- raster::stack("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/persistence_at_95_magicValley_1986_2020_clipped_to_1986_poly_cutline.tif")
 
-names(data) <- c('Persistence_95', 'difference_class', "dif_perc_class")
+persistence_ras = raster::raster("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/persistence_new_RAT_lyr_magicValley_1986_2020.tif") 
+diff_ras = raster::raster("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/difference_new_RAT_lyr_magicValley_1986_2020.tif") 
+diff_cls_ras = raster::raster("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/difference_5percent_new_RAT_lyr_magicValley_1986_2020.tif") 
 
-
-# data[[1]] <- as.factor(values(data[[1]]))
-# data[[2]] <- as.factor(values(data[[2]]))
-# data[[3]] <- as.factor(values(data[[3]]))
-# 
 # levels(data[[1]])[[1]]$VALUE <-  c("No", "Yes")
 # levels(data[[2]])[[1]]$VALUE <-  c("Lower", "Same", "Higher")
 # levels(data[[3]])[[1]]$VALUE <-  c("Lower", "Same", "Higher")
@@ -59,12 +55,10 @@ names(data) <- c('Persistence_95', 'difference_class', "dif_perc_class")
 # field_shp <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/dominant_crop_cover_2005_to_2020_with_2016_field_boundry.shp")
 field_shp <- qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/dominant_crop_cover_2005_to_2020_with_2016_field_boundry.qs")
 tictoc::toc()
-# 
-# Persistence_val = as.factor(c(0:1))
-# diff_val = as.factor(c(-1,0,1))
 
-Persistence_pal <- colorFactor("Spectral", as.factor(values(data[[1]])), na.color = NA)
-diff_pal <- colorFactor("Spectral", as.factor(values(data[[2]])), na.color = NA)
+
+# Persistence_pal <- colorFactor("Spectral", as.factor(values(data[[1]])), na.color = NA)
+# diff_pal <- colorFactor("Spectral", as.factor(values(data[[2]])), na.color = NA)
 
 
 
@@ -122,73 +116,74 @@ server <- function(input, output, session) {
   
   observe({
     leafletProxy("map") %>%
-        addRasterImage(data[["Persistence_95"]],
-                       colors = Persistence_pal,
+        addRasterImage(persistence_ras,
+                       colors = "viridis",
                        opacity = 1,
                        layerId = "Persistence_95",
                        group = "Persistence",
                        project = FALSE) %>%
-        # addMouseCoordinates() %>%
-        # addImageQuery(data[["Persistence_95"]], type="mousemove", layerId = "Persistence_95")%>%
-        # addRasterImage(data[["difference_class"]],
-        #                colors = diff_pal,
+        addMouseCoordinates() %>%
+        addImageQuery(persistence_ras, type="mousemove", layerId = "Persistence_95")
+    # %>%
+        # addRasterImage(diff_ras,
+        #                # colors = diff_pal,
         #                opacity = 1,
         #                layerId = "difference_class",
         #                group = "Low/Same/High",
         #                project = FALSE) %>%
         #                    addMouseCoordinates() %>%
-        #                    addImageQuery(data[["difference_class"]], type="mousemove", layerId = "difference_class")%>%
-        # addRasterImage(data[["dif_perc_class"]],
-        #                colors = diff_pal,
+        #                    addImageQuery(diff_ras, type="mousemove", layerId = "difference_class")%>%
+        # addRasterImage(diff_cls_ras,
+        #                # colors = diff_pal,
         #                opacity = 1,
         #                layerId = "dif_perc_class",
         #                group = "Difference from field mean greater than 5%",
         #                project = FALSE) %>%
         # addMouseCoordinates() %>%
-        # addImageQuery(data[["dif_perc_class"]], type="mousemove", layerId = "dif_perc_class")%>%
-        addPolygons(data = field_shp,
-                    color = "red",
-                    fillColor = "gray",
-                    fillOpacity = 0.1,
-                    weight = 1.5,
-                    group = "Field Boundary",
-                    popup = popup <- paste0("<strong>2005:</strong>", field_shp$Crop_2005,"<br/>",
-                                            "<strong>2007:</strong>", field_shp$Crop_2007, "<br/>",
-                                            "<strong>2008:</strong>", field_shp$Crop_2008, "<br/>",
-                                            "<strong>2010:</strong>", field_shp$Crop_2010, "<br/>",
-                                            "<strong>2011:</strong>", field_shp$Crop_2011, "<br/>",
-                                            "<strong>2012:</strong>", field_shp$Crop_2012, "<br/>",
-                                            "<strong>2013:</strong>", field_shp$Crop_2013, "<br/>",
-                                            "<strong>2014:</strong>", field_shp$Crop_2014, "<br/>",
-                                            "<strong>2015:</strong>", field_shp$Crop_2015, "<br/>",
-                                            "<strong>2016:</strong>", field_shp$Crop_2016, "<br/>",
-                                            "<strong>2017:</strong>", field_shp$Crop_2017, "<br/>",
-                                            "<strong>2018:</strong>", field_shp$Crop_2018, "<br/>",
-                                            "<strong>2019:</strong>", field_shp$Crop_2019, "<br/>",
-                                            "<strong>2020:</strong>", field_shp$Crop_2020, "<br/>")) %>%
-        addLegend("topleft", pal=Persistence_pal, values=as.factor(values(data[[1]])),
-                  title="Persistently different:", opacity=1, layerId="Persistence_leg",
-                  labFormat  = labelFormat(
-                    transform = function(x) {
-                      levels(data[[1]])[[1]]$VALUE[which(levels(data[[1]])[[1]]$ID == x)]
-                    })) %>%
-        addLegend("topleft", pal=diff_pal, values=as.factor(values(data[[3]])),
-                  title="Difference greater than +-5% of field mean ET:", opacity=1, layerId="diff_high_low_leg",
-                  labFormat  = labelFormat(
-                    transform = function(x) {
-                      levels(data[[3]])[[1]]$VALUE[which(levels(data[[3]])[[1]]$ID == x)]
-                    })) %>%
-        addLegend("topleft", pal=diff_pal, values= as.factor(values(data[[2]])),
-                  title="Compared to field mean ET:", opacity=1, layerId="Persistence_leg1",
-                  labFormat  = labelFormat(
-                    transform = function(x) {
-                      levels(data[[2]])[[1]]$VALUE[which(levels(data[[2]])[[1]]$ID == x)]
-                    })
-                  ) %>%
-        addLayersControl(overlayGroups = c("Persistence", "Low/Same/High",
-                                           "Difference from field mean greater than 5%", "Field Boundary"),
-          options = layersControlOptions(collapsed = FALSE, title = "Layer Control")
-          )%>% hideGroup(c("Low/Same/High", "Difference from field mean greater than 5%"))
+        # addImageQuery(diff_cls_ras, type="mousemove", layerId = "dif_perc_class")%>%
+        # addPolygons(data = field_shp,
+        #             color = "red",
+        #             fillColor = "gray",
+        #             fillOpacity = 0.1,
+        #             weight = 1.5,
+        #             group = "Field Boundary",
+        #             popup = popup <- paste0("<strong>2005:</strong>", field_shp$Crop_2005,"<br/>",
+        #                                     "<strong>2007:</strong>", field_shp$Crop_2007, "<br/>",
+        #                                     "<strong>2008:</strong>", field_shp$Crop_2008, "<br/>",
+        #                                     "<strong>2010:</strong>", field_shp$Crop_2010, "<br/>",
+        #                                     "<strong>2011:</strong>", field_shp$Crop_2011, "<br/>",
+        #                                     "<strong>2012:</strong>", field_shp$Crop_2012, "<br/>",
+        #                                     "<strong>2013:</strong>", field_shp$Crop_2013, "<br/>",
+        #                                     "<strong>2014:</strong>", field_shp$Crop_2014, "<br/>",
+        #                                     "<strong>2015:</strong>", field_shp$Crop_2015, "<br/>",
+        #                                     "<strong>2016:</strong>", field_shp$Crop_2016, "<br/>",
+        #                                     "<strong>2017:</strong>", field_shp$Crop_2017, "<br/>",
+        #                                     "<strong>2018:</strong>", field_shp$Crop_2018, "<br/>",
+        #                                     "<strong>2019:</strong>", field_shp$Crop_2019, "<br/>",
+        #                                     "<strong>2020:</strong>", field_shp$Crop_2020, "<br/>")) %>%
+        # addLegend("topleft", pal=Persistence_pal, values=as.factor(values(data[[1]])),
+        #           title="Persistently different:", opacity=1, layerId="Persistence_leg",
+        #           labFormat  = labelFormat(
+        #             transform = function(x) {
+        #               levels(data[[1]])[[1]]$VALUE[which(levels(data[[1]])[[1]]$ID == x)]
+        #             })) %>%
+        # addLegend("topleft", pal=diff_pal, values=as.factor(values(data[[3]])),
+        #           title="Difference greater than +-5% of field mean ET:", opacity=1, layerId="diff_high_low_leg",
+        #           labFormat  = labelFormat(
+        #             transform = function(x) {
+        #               levels(data[[3]])[[1]]$VALUE[which(levels(data[[3]])[[1]]$ID == x)]
+        #             })) %>%
+        # addLegend("topleft", pal=diff_pal, values= as.factor(values(data[[2]])),
+        #           title="Compared to field mean ET:", opacity=1, layerId="Persistence_leg1",
+        #           labFormat  = labelFormat(
+        #             transform = function(x) {
+        #               levels(data[[2]])[[1]]$VALUE[which(levels(data[[2]])[[1]]$ID == x)]
+        #             })
+        #           ) %>%
+        # addLayersControl(overlayGroups = c("Persistence", "Low/Same/High",
+        #                                    "Difference from field mean greater than 5%", "Field Boundary"),
+        #   options = layersControlOptions(collapsed = FALSE, title = "Layer Control")
+        #   )%>% hideGroup(c("Low/Same/High", "Difference from field mean greater than 5%"))
   })
       
   

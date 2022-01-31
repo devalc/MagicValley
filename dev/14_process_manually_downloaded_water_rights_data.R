@@ -55,6 +55,13 @@ df = sf::st_join(water_rights_for_magic_valley, left = FALSE, fields2016['FID'])
                                               OverallMax >= 6.001 ~ "very_high"
                                               ))%>% dplyr::select(-c(Source, Status))
 ## Categories Erin suggested: low 0-2, med = 2-3, 3-6 high, >6 very high
+## irri rateL 0.2 cfs /acre
+
+sf::st_write(df, "D:/OneDrive - University of Idaho/MagicValleyData/Water_Rights_PODs/field_stats/water_rights_info_processed_points.shp")
+qs::qsave(df, "D:/OneDrive - University of Idaho/MagicValleyData/Water_Rights_PODs/field_stats/water_rights_info_processed_points.qs")
+
+
+
 
 df1 = df %>%
 as.data.frame()%>% dplyr::select(-geometry)

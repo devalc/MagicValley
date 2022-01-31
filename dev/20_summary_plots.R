@@ -23,13 +23,30 @@ cat("\014")
 
 ## ----------------------------------Load packages---------------------------------------##
 
-
-library(mapview)
 library(qs)
-library(rmapshaper)
+library(tmap)
+library(leaflet)
+library(tidyverse)
+
 
 save_dir = "D:/GitHub/MagicValley/plots/"
 
 
 fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/field_boundaries_with_all_stats.qs")
 
+head(fields)
+
+tm_style("col_blind")
+
+## --------------------------------------------------------------------------------------##
+irr_status_map = tm_shape(fields,name = "Irrigation Status") +
+  tm_borders("black",lwd = 0.0001) +
+  tm_fill("IRRI_ST",alpha = 1,palette = "cat",style = "cat")
+
+tmap_save(irr_status_map, paste0(save_dir, "Irrigation_Status_map.png"),
+          dpi = 300,
+          width = 16,
+          height = 12,units = "in")
+## --------------------------------------------------------------------------------------##
+
+ 

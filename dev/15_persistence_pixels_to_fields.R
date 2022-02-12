@@ -29,7 +29,7 @@ library(exactextractr)
 ## --------------------------------------------------------------------------------------##
 raster::beginCluster()
 
-rast_data <- raster::stack("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/persistence_at_95_magicValley_1986_2020_clipped_to_1986_poly_cutline.tif")
+rast_data <- raster::stack("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/persistence_clipped_to_2016_poly_cutline.tif")
 
 rast_data95 <- rast_data[[1]]
 rm(rast_data)
@@ -38,8 +38,7 @@ fields2016 <- sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Cro
 
 raster::endCluster()
 
-# v=exact_extract(rast_data95, fields2016,
-#                  function(value, cov_frac) value )
+
 
 fields2016=fields2016%>% dplyr::mutate(Persistance_percent = exact_extract(rast_data95, fields2016,
                  function(value, cov_frac) (sum(value[!is.na(value)] == 1)/length(value[!is.na(value)]))*100 ),
@@ -47,5 +46,5 @@ fields2016=fields2016%>% dplyr::mutate(Persistance_percent = exact_extract(rast_
 
 
 
-sf::st_write(fields2016, "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/field_stats/field_perisitance_stats_magick_valley.shp")
-qs::qsave(fields2016, "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/field_stats/field_perisitance_stats_magick_valley.qs")
+sf::st_write(fields2016, "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/field_stats/field_perisitance_stats_magick_valley.shp")
+qs::qsave(fields2016, "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/field_stats/field_perisitance_stats_magick_valley.qs")

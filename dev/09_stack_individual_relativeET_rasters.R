@@ -27,7 +27,7 @@ library(raster)
 
 raster::beginCluster()
 
-ras_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/"
+ras_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/"
 
 ras_list = list.files(ras_loc, pattern = "\\.tif$", full.names = TRUE)[1:16]
 

@@ -24,9 +24,9 @@ cat("\014")
 ## ----------------------------------Load packages---------------------------------------##
 library(raster)
 
-write_rat_back = "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/"
+write_rat_back = "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/"
 
-data <- raster::stack("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/persistence_at_95_magicValley_1986_2020_clipped_to_1986_poly_cutline.tif")
+data <- raster::stack("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/persistence_clipped_to_2016_poly_cutline.tif")
 
 names(data) <- c('Persistence_95', 'difference_class', "dif_perc_class")
 
@@ -55,9 +55,6 @@ dpercrat$Class_Names <- c("More than 5% lower than field average",
 levels(diff_perc_cls_rat) = dpercrat
 
 
-# rasfinal = raster::stack(persistence_rat, 
-#                          diff_class_rat, 
-#                          diff_perc_cls_rat, RAT = TRUE)
 
 
 raster::writeRaster(persistence_rat, 

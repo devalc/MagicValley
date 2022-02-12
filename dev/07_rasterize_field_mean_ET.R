@@ -26,17 +26,23 @@ cat("\014")
 library(stars)
 library(tidyverse)
 
-save_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Zonal_stats_ET/vectorized_fieldmeanET/"
+save_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Zonal_stats_ET/rasterized_fieldmeanET/"
 
 shp_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Zonal_stats_ET/"
 
 ## --------------------------------------------------------------------------------------##
-template_raster <- stars::read_stars("D:/OneDrive - University of Idaho/MagicValleyData/IDWR_Metric_ET_annual_totals_clipped_to_magicvalley_wgs84/p3940_20200401to20201031_et.tif")
+#create_template_raster for burning field values to pixels
 
+template_raster = raster::raster("D:/OneDrive - University of Idaho/MagicValleyData/IDWR_Metric_ET_annual_totals_clipped_to_magicvalley_wgs84/p3940_20200401to20201031_et.tif")
+raster::values(template_raster) <- NA
+
+template_raster = stars::st_as_stars(template_raster)
 
 ## --------------------------------------------------------------------------------------##
 
 shp_list = list.files(shp_loc, pattern = "\\.shp$",full.names = TRUE) 
+
+
 
 for (shp in shp_list) {
   yr = tools::file_path_sans_ext(stringr::str_split(shp,"_")[[1]][7])

@@ -35,12 +35,12 @@ library(sf)
 library(tidyverse)
 library(qs)
 
-ET_persistence = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/persistence/field_stats/field_perisitance_stats_magick_valley.shp")
+ET_persistence = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/field_stats/field_perisitance_stats_magick_valley.shp")
 WR_stats = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Water_Rights_PODs/field_stats/water_rights_info_appeneded_to_2016_field_boundries.shp")
 soils_stats = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/gSSURGO_ID_data/field_stats/gSURRGO_soils_field_stats.shp")
 elev = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Elevation_data/field_stats/elevation_slope_magicValley_field_stats.shp")
-water_districts = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Water_districts/Water_Districts.geojson")
-irri_org = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigation_Organization/Irrigation_Organizations.geojson")
+# water_districts = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Water_districts/Water_Districts.geojson")
+# irri_org = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigation_Organization/Irrigation_Organizations.geojson")
 
 
 WR_stats = WR_stats %>% as.data.frame()%>% dplyr::select(FID,
@@ -67,52 +67,52 @@ merged_shps = ET_persistence %>%
   dplyr::left_join(elev, by =c("FID")) %>%
   dplyr::select(-c(MastrCt))
 
-water_districts = water_districts %>% sf::st_make_valid() %>% dplyr::rename("FID_WD" = "FID")
-irri_org=irri_org%>% sf::st_make_valid() 
+# water_districts = water_districts %>% sf::st_make_valid() %>% dplyr::rename("FID_WD" = "FID")
+# irri_org=irri_org%>% sf::st_make_valid() 
+# 
+# df = sf::st_join(water_districts, left = FALSE, merged_shps['FID'])
+# # %>%    
+# a = df %>%dplyr::distinct(FID, .keep_all = TRUE)
 
-df = sf::st_join(water_districts, left = FALSE, merged_shps['FID'])
-# %>%    
-a = df %>%dplyr::distinct(FID, .keep_all = TRUE)
-
-# sf::st_write(merged_shps, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/field_boundaries_with_all_stats.shp")
-# qs::qsave(merged_shps, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/field_boundaries_with_all_stats.qs")
+sf::st_write(merged_shps, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.shp")
+qs::qsave(merged_shps, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.qs")
 
 
 ## remove geom and simplify geometry
-# 
-# merged_shps1 = merged_shps %>% dplyr::mutate(Rotation = paste0(Cr_2005, "-",
-#                                                                Cr_2007, "-",
-#                                                                Cr_2008, "-",
-#                                                                Cr_2009, "-",
-#                                                                Cr_2010, "-",
-#                                                                Cr_2011, "-",
-#                                                                Cr_2012, "-",
-#                                                                Cr_2013, "-",
-#                                                                Cr_2014, "-",
-#                                                                Cr_2015, "-",
-#                                                                Cr_2016, "-",
-#                                                                Cr_2017, "-",
-#                                                                Cr_2018, "-",
-#                                                                Cr_2019, "-",
-#                                                                Cr_2020)) %>% dplyr::select(-c(Cr_2005,
-#                                                                                               Cr_2007,
-#                                                                                               Cr_2008,
-#                                                                                               Cr_2009,
-#                                                                                               Cr_2010,
-#                                                                                               Cr_2011,
-#                                                                                               Cr_2012,
-#                                                                                               Cr_2013,
-#                                                                                               Cr_2014,
-#                                                                                               Cr_2015,
-#                                                                                               Cr_2016,
-#                                                                                               Cr_2017,
-#                                                                                               Cr_2018,
-#                                                                                               Cr_2019,
-#                                                                                               Cr_2020))
 
-# library(rmapshaper)
-# 
-# merged_shps2 <- ms_simplify(merged_shps1, keep_shapes = TRUE)
+merged_shps1 = merged_shps %>% dplyr::mutate(Rotation = paste0(Cr_2005, "-",
+                                                               Cr_2007, "-",
+                                                               Cr_2008, "-",
+                                                               Cr_2009, "-",
+                                                               Cr_2010, "-",
+                                                               Cr_2011, "-",
+                                                               Cr_2012, "-",
+                                                               Cr_2013, "-",
+                                                               Cr_2014, "-",
+                                                               Cr_2015, "-",
+                                                               Cr_2016, "-",
+                                                               Cr_2017, "-",
+                                                               Cr_2018, "-",
+                                                               Cr_2019, "-",
+                                                               Cr_2020)) %>% dplyr::select(-c(Cr_2005,
+                                                                                              Cr_2007,
+                                                                                              Cr_2008,
+                                                                                              Cr_2009,
+                                                                                              Cr_2010,
+                                                                                              Cr_2011,
+                                                                                              Cr_2012,
+                                                                                              Cr_2013,
+                                                                                              Cr_2014,
+                                                                                              Cr_2015,
+                                                                                              Cr_2016,
+                                                                                              Cr_2017,
+                                                                                              Cr_2018,
+                                                                                              Cr_2019,
+                                                                                              Cr_2020))
 
-# sf::st_write(merged_shps2, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/simplified_field_boundaries_with_all_stats.shp")
-# qs::qsave(merged_shps2, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/simplified_field_boundaries_with_all_stats.qs")
+library(rmapshaper)
+# 
+merged_shps2 <- ms_simplify(merged_shps1, keep_shapes = TRUE)
+
+sf::st_write(merged_shps2, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/simplified_field_boundaries_with_all_stats.shp")
+qs::qsave(merged_shps2, "D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/simplified_field_boundaries_with_all_stats.qs")

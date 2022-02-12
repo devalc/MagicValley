@@ -32,8 +32,8 @@ library(tidyverse)
 save_dir = "D:/GitHub/MagicValley/plots/"
 
 
-fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/field_boundaries_with_all_stats.qs")
-fields_simplified = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/simplified_field_boundaries_with_all_stats.qs")
+fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.qs")
+fields_simplified = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/simplified_field_boundaries_with_all_stats.qs")
 
 head(fields)
 
@@ -106,3 +106,12 @@ source = mapview::mapview(WR_points, zcol="source")
 
 
 RDR_class = mapview::mapview(WR_points, zcol="RDR_classs")
+
+fields_with_100_persistence = fields %>% dplyr::filter(Prsstn_ == 100)
+mapview::mapview(fields_with_100_persistence, zcol="Prsstn_")
+
+fields_with_more70_persistence = fields %>% dplyr::filter(Prsstn_>=70)
+mapview::mapview(fields_with_more70_persistence, zcol="Prsstn_")
+
+## --------------------------------------------------------------------------------------##
+## 

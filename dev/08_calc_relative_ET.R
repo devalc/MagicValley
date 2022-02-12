@@ -29,8 +29,9 @@ library(tidyverse)
 
 ras_path = "D:/OneDrive - University of Idaho/MagicValleyData/IDWR_Metric_ET_annual_totals_clipped_to_magicvalley_wgs84/"
 
-shp_path = "D:/OneDrive - University of Idaho/MagicValleyData/Zonal_stats_ET/vectorized_fieldmeanET/"
+shp_path = "D:/OneDrive - University of Idaho/MagicValleyData/Zonal_stats_ET/rasterized_fieldmeanET/"
 
+write_loc = "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/"
 ## --------------------------------------------------------------------------------------##
 
 FieldMean1986 <- raster::raster(paste0(shp_path, "rasterized_fieldmeanET_1986.tif"))
@@ -89,49 +90,53 @@ RelET2020 = ET2020 / FieldMean2020
 
 ## --------------------------------------------------------------------------------------##
 raster::writeRaster(RelET1986,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_1986.tif")
+                    paste0(write_loc,"Relative_ET_1986.tif")
+                    )
 
 raster::writeRaster(RelET1996,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_1996.tif")
+                    paste0(write_loc,"Relative_ET_1996.tif")
+                    )
 
 raster::writeRaster(RelET2000,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2000.tif")
+                    paste0(write_loc,"Relative_ET_2000.tif")
+                    )
 
 raster::writeRaster(RelET2002,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2002.tif")
+                    paste0(write_loc,"Relative_ET_2002.tif")
+                    )
 
 raster::writeRaster(RelET2006,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2006.tif")
+                    paste0(write_loc,"Relative_ET_2006.tif"))
 
 raster::writeRaster(RelET2008,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2008.tif")
+                    paste0(write_loc,"Relative_ET_2008.tif"))
 
 raster::writeRaster(RelET2009,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2009.tif")
+                    paste0(write_loc,"Relative_ET_2009.tif"))
 
 raster::writeRaster(RelET2010,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2010.tif")
+                    paste0(write_loc,"Relative_ET_2010.tif"))
 
 raster::writeRaster(RelET2011,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2011.tif")
+                    paste0(write_loc,"Relative_ET_2011.tif"))
 
 raster::writeRaster(RelET2013,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2013.tif")
+                    paste0(write_loc,"Relative_ET_2013.tif"))
 
 raster::writeRaster(RelET2015,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2015.tif")
+                    paste0(write_loc,"Relative_ET_2015.tif"))
 
 raster::writeRaster(RelET2016,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2016.tif")
+                    paste0(write_loc,"Relative_ET_2016.tif"))
 
 raster::writeRaster(RelET2017,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2017.tif")
+                    paste0(write_loc,"Relative_ET_2017.tif"))
 
 raster::writeRaster(RelET2018,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2018.tif")
+                    paste0(write_loc,"Relative_ET_2018.tif"))
 
 raster::writeRaster(RelET2019,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2019.tif")
+                    paste0(write_loc,"Relative_ET_2019.tif"))
 
 raster::writeRaster(RelET2020,
-                    "D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/Relative_ET_2020.tif")
+                    paste0(write_loc,"Relative_ET_2020.tif"))

@@ -72,7 +72,7 @@ datadf_with_stats <- datadf_with_stats %>%
 datadf_with_stats <- datadf_with_stats %>% dplyr::mutate(diff_perc = difference_95/mean_95 *100)%>% 
   dplyr::mutate(dif_perc_class = dplyr::case_when((persistance_95==1 & diff_perc < -5) ~ as.integer(-1),
                                                   (persistance_95==1 & diff_perc > 5) ~ as.integer(1),
-                                                  persistance_95==0 ~ as.integer(0),
+                                                  persistance_95==0 ~ as.integer(0),  ## switch off
                                                   TRUE  ~ NA_integer_))
 
 

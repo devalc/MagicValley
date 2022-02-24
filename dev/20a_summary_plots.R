@@ -115,3 +115,4 @@ mapview::mapview(fields_with_more70_persistence, zcol="Prsstn_")
 
 ## --------------------------------------------------------------------------------------##
 ## 
+mapview::mapview(fields, zcol="elvtn_m_d")

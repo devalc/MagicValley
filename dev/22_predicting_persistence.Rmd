@@ -11,21 +11,21 @@ library(tidyverse)
 library(tidymodels)
 library(textrecipes)
 library(finetune)
+library(vip)
 ```
 
 ```{r, echo=FALSE, message=FALSE,}
-fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.qs")
+fields= qs::qread("C:/Chinmay/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.qs")%>% as.data.frame() %>% dplyr::select(-geometry)
 
 
-fields_with_one_crop = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/one_dominant_crop_over_entire_ts.qs")%>%
+fields_with_one_crop = qs::qread("C:/Chinmay/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/one_dominant_crop_over_entire_ts.qs")%>%
   as.data.frame()%>%dplyr::select("FID","Crop") 
 
 
-fields_merged = dplyr::left_join(fields, fields_with_one_crop, by=c("FID"))%>%
-  dplyr::mutate_if(sapply(., is.character), as.factor)
+fields_merged = dplyr::left_join(fields, fields_with_one_crop, by=c("FID"))%>%   dplyr::mutate_if(sapply(., is.character), as.factor)
 
 fields_merged_all = fields_merged %>%as.data.frame()%>%
-  dplyr::select(-c(geometry, FID, sndc_mn, sndc_mx, sndc_df,
+  dplyr::select(-c(FID, sndc_mn, sndc_mx, sndc_df,
                    Cr_2005, Cr_2007, Cr_2008, Cr_2009,
                    Cr_2010,Cr_2011,
                 Cr_2012,Cr_2013,Cr_2014,Cr_2015,Cr_2016,Cr_2017,
@@ -112,14 +112,14 @@ tune_res <- tune_grid(
   resamples = trees_folds,
   grid = 20
 )
-
+doParallel::stopImplicitCluster()
 tune_res
 ```
 
 ```{r}
 tune_res %>%
   collect_metrics() %>%
-  filter(.metric == "roc_auc") %>%
+  filter(.metric == "rmse") %>%
   select(mean, min_n, mtry) %>%
   pivot_longer(min_n:mtry,
     values_to = "value",
@@ -128,13 +128,14 @@ tune_res %>%
   ggplot(aes(value, mean, color = parameter)) +
   geom_point(show.legend = FALSE) +
   facet_wrap(~parameter, scales = "free_x") +
-  labs(x = NULL, y = "AUC")
+  labs(x = NULL, y = "RMSE")
 ```
 
 ```{r}
+
 rf_grid <- grid_regular(
-  mtry(range = c(10, 30)),
-  min_n(range = c(2, 8)),
+  mtry(range = c(8, 25)),
+  min_n(range = c(15, 40)),
   levels = 5
 )
 
@@ -143,47 +144,48 @@ rf_grid
 
 
 ```{r}
+doParallel::registerDoParallel()
 set.seed(456)
 regular_res <- tune_grid(
   tune_wf,
   resamples = trees_folds,
   grid = rf_grid
 )
-
+doParallel::stopImplicitCluster()
 regular_res
 ```
 
 ```{r}
 regular_res %>%
   collect_metrics() %>%
-  filter(.metric == "roc_auc") %>%
+  filter(.metric == "rmse") %>%
   mutate(min_n = factor(min_n)) %>%
   ggplot(aes(mtry, mean, color = min_n)) +
   geom_line(alpha = 0.5, size = 1.5) +
   geom_point() +
-  labs(y = "AUC")
+  labs(y = "RMSE")
 ```
 
 
 ```{r}
-best_auc <- select_best(regular_res, "roc_auc")
-
+best_rmse <- select_best(regular_res, "rmse")
+doParallel::registerDoParallel()
 final_rf <- finalize_model(
-  tune_spec,
-  best_auc
+  fields_spec,
+  best_rmse
 )
-
+doParallel::stopImplicitCluster()
+foreach::registerDoSEQ()
 final_rf
 ```
 
 
 ```{r}
-library(vip)
 
 final_rf %>%
   set_engine("ranger", importance = "permutation") %>%
-  fit(legal_status ~ .,
-    data = juice(tree_prep) %>% select(-tree_id)
+  fit(Prsstn_ ~ .,
+    data = juice(fields_prep)
   ) %>%
   vip(geom = "point")
 ```
@@ -191,11 +193,11 @@ final_rf %>%
 
 ```{r}
 final_wf <- workflow() %>%
-  add_recipe(tree_rec) %>%
+  add_recipe(fields_rec) %>%
   add_model(final_rf)
 
 final_res <- final_wf %>%
-  last_fit(trees_split)
+  last_fit(fields_split)
 
 final_res %>%
   collect_metrics()

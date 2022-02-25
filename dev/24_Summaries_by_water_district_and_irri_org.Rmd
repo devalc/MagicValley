@@ -1,0 +1,175 @@
+---
+title: "Summaries for water and Irrigation districts"
+date: "`r Sys.Date()`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: axist
+    mathjax: default
+    use_fontawesome: true
+    toc: false
+    toc_float: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+library(qs)
+library(tmap)
+library(leaflet)
+library(tidyverse)
+library(DT)
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+data = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/Relative_ET/new_rel_ET/persistence/field_stats/fields_all_stats_including_waterdist_and_irri_org.qs")
+
+water_districts = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Water_districts/Water_Districts.geojson")%>% sf::st_make_valid() %>% dplyr::select(-c(Shape_Leng, Shape_Area))%>%
+  dplyr::rename("DISTAME_WD"= "DISTAME") 
+
+irri_org = sf::st_read("D:/OneDrive - University of Idaho/MagicValleyData/Irrigation_Organization/Irrigation_Organizations.geojson")%>% sf::st_make_valid()
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+
+water_districts_fid_and_geom_and_name = water_districts %>% 
+  dplyr::select(FID, DISTAME_WD)%>%
+  dplyr::rename("FID_WD"= "FID")
+
+irrigation_districts_fid_geom_and_name = irri_org %>% 
+  dplyr::select(OBJECTID, NAME)%>% 
+  dplyr::rename("OBJECTID_IrriOrg" = "OBJECTID",
+                "NAME_IrriOrg" = "NAME" )
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+data_meaningful_cols = data %>% as.data.frame() %>%
+  dplyr::select(-c(sndc_mn,sndc_mx, sndc_df, DISTRICT_WD,BASNO_WD,REGION_WD,
+                  STATUS_WD,Shape_Leng_WD, Shape_Area_WD,DISTAME_WD,Owner_IrriOrg,
+                  PlaceOfUse_IrriOrg,LPOU_IrriOrg,LPOU_IrriOrg,PROCESS_IrriOrg,
+                  PERIMETER_IrriOrg,ACRES_IrriOrg, NAME_IrriOrg, ShapeSTArea_IrriOrg,ShapeSTLength_IrriOrg,geometry) ) 
+
+WD_summaries = data_meaningful_cols %>%
+  group_by(FID_WD)%>% 
+  summarise_if(.predicate = is.numeric,
+               .funs = ~ mean(.x, na.rm = TRUE)
+                )%>%
+    dplyr::mutate(dplyr::across(where(is.numeric), round, 1))%>% 
+  dplyr::arrange( -Prsstn_)
+
+WD_summaries = dplyr::left_join(water_districts_fid_and_geom_and_name,WD_summaries, by = "FID_WD")%>%
+  dplyr::select(FID_WD,DISTAME_WD, everything())%>% dplyr::arrange( -Prsstn_) 
+
+
+Irri_summaries = data_meaningful_cols %>% 
+  dplyr::select(-FID_WD)%>%
+  group_by(OBJECTID_IrriOrg)%>% 
+  summarise_if(.predicate = is.numeric,
+               .funs = ~ mean(.x, na.rm = TRUE)
+                )%>%
+    dplyr::mutate(dplyr::across(where(is.numeric), round, 1))
+
+Irri_summaries = dplyr::left_join(irrigation_districts_fid_geom_and_name,Irri_summaries, by = "OBJECTID_IrriOrg")%>%
+  dplyr::select(OBJECTID_IrriOrg,NAME_IrriOrg, everything())%>% dplyr::arrange( -Prsstn_) 
+
+
+```
+
+### Data summaries by water districts
+#### Table
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+DT::datatable(WD_summaries,
+              class = "display",
+              extensions=c("Scroller","Buttons"),
+              options=list(dom = 'BRSfrti',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                           deferRender=TRUE,
+                           scrollX=400,
+                           scrollY=250,
+                           scroller=TRUE,
+                           autoWidth = TRUE,
+                           fixedHeader = FALSE,
+                           fillContainer = FALSE,
+                           columnDefs = list(list(className = 'dt-left',
+                                                  width = '100%',visible=FALSE))),
+               rownames= FALSE)%>%
+  DT::formatStyle(
+    'Prsstn_',
+    background = styleColorBar(WD_summaries$Prsstn_, '#ED6A76'),
+    backgroundSize = '90% 100%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+```
+#### Map of mean ET persistence by water district
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+mapview::mapview(WD_summaries, zcol= "Prsstn_")
+```
+
+
+### Data summaries by Irrigation districts
+#### Table
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+DT::datatable(Irri_summaries,
+              class = "display",
+              extensions=c("Scroller","Buttons"),
+              options=list(dom = 'BRSfrti',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                           deferRender=TRUE,
+                           scrollX=400,
+                           scrollY=250,
+                           scroller=TRUE,
+                           autoWidth = TRUE,
+                           fixedHeader = FALSE,
+                           fillContainer = FALSE,
+                           columnDefs = list(list(className = 'dt-left',
+                                                  width = '100%',visible=FALSE))),
+               rownames= FALSE)%>%
+  DT::formatStyle(
+    'Prsstn_',
+    background = styleColorBar(WD_summaries$Prsstn_, '#ED6A76'),
+    backgroundSize = '90% 100%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+```
+
+#### Map of mean ET persistence by Irrigation district
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+mapview::mapview(Irri_summaries, zcol= "Prsstn_")
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+```

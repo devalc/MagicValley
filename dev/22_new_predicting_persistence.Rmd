@@ -1,0 +1,110 @@
+---
+title: "Predict persistence"
+author: "Chinmay Deval"
+date: "2/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidymodels)
+library(textrecipes)
+library(finetune)
+library(vip)
+```
+
+```{r, echo=FALSE, message=FALSE,}
+fields= qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/stats_merged_shp/new_stats/field_boundaries_with_all_stats.qs")%>% as.data.frame() %>% dplyr::select(-geometry)
+
+
+fields_with_one_crop = qs::qread("D:/OneDrive - University of Idaho/MagicValleyData/CropScape_data_for_magicvalley/Common_land_cover_category/dominant_crop_cover_ts_shp/one_dominant_crop_over_entire_ts.qs")%>%
+  as.data.frame()%>%dplyr::select("FID","Crop") 
+
+
+fields_merged = dplyr::left_join(fields, fields_with_one_crop, by=c("FID"))%>%   dplyr::mutate_if(sapply(., is.character), as.factor)
+
+fields_merged_all = fields_merged %>%as.data.frame()%>%
+  dplyr::select(-c(FID, sndc_mn, sndc_mx, sndc_df,
+                   Cr_2005, Cr_2007, Cr_2008, Cr_2009,
+                   Cr_2010,Cr_2011,
+                Cr_2012,Cr_2013,Cr_2014,Cr_2015,Cr_2016,Cr_2017,
+                Cr_2018,Cr_2019, Cr_2020, Owner))%>%na.omit()%>% 
+    dplyr::mutate(IRRI_ST = stringr::str_remove(IRRI_ST, "-"),
+                  WR_class = stringr::str_remove(WR_class, "_WaterRight"),
+                  RDR_classs = stringr::str_remove(RDR_classs, "_"),
+                  Year = lubridate::year(PriorityDa),
+                  IRRI_ST = as.factor(IRRI_ST),
+                  WR_class = as.factor(WR_class),
+                  RDR_classs = as.factor(RDR_classs))%>% dplyr::select(-PriorityDa)
+
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+skimr::skim(fields_merged_all)
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+fields_merged_all= fields_merged_all %>% dplyr::mutate(Prsstn_cls= dplyr::case_when(Prsstn_ == 0 ~ "No",
+                                                     dplyr::between(Prsstn_, 0.001,30)~ "low",dplyr::between(Prsstn_, 30.0001,60)~ "Medium",
+                                                     Prsstn_ > 60~ "High" )) %>% dplyr::select(-Prsstn_)%>% na.omit()
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+set.seed(123)
+
+fields_split = fields_merged_all %>% initial_split(strata = Prsstn_cls)
+
+fields_train = training(fields_split)
+fields_test = testing(fields_split)
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+ 
+set.seed(234)
+fields_boot = bootstraps(fields_train)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+glm_spec = logistic_reg()%>%
+  set_engine("glm")
+
+rf_spec = rand_forest()%>%
+  set_mode("classification")%>%
+  set_engine("ranger")
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+fields_wf = workflow() %>% 
+  add_formula(Prsstn_cls ~ .)
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+glm_res= fields_wf %>% 
+  add_model(glm_spec) %>%
+  fit_resamples(resamples = fields_boot,
+                control = control_resamples(save_pred = TRUE, verbose = TRUE))
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+rf_res= fields_wf %>% 
+  add_model(rf_spec) %>%
+  fit_resamples(resamples = fields_boot,
+                control = control_resamples(save_pred = TRUE, verbose = TRUE))
+```
+
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+
+```
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+
+```
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+
+```

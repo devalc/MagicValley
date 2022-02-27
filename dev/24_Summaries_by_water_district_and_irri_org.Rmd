@@ -65,6 +65,17 @@ WD_summaries = dplyr::left_join(water_districts_fid_and_geom_and_name,WD_summari
   dplyr::select(FID_WD,DISTAME_WD, everything())%>% dplyr::arrange( -Prsstn_) 
 
 
+WD_summaries_factor_vars = data_meaningful_cols %>% dplyr::select(FID_WD,IRRI_ST, Cr_2005, Cr_2007, Cr_2008, Cr_2009, Cr_2010, Cr_2011, Cr_2012, Cr_2013, Cr_2014, Cr_2015, Cr_2016, Cr_2017, Cr_2018, Cr_2019, Cr_2020, source, WR_class, RDR_classs)%>% reshape2::melt(id = "FID_WD")%>%  
+filter(!is.na(value)) %>%
+  group_by(FID_WD, variable)%>%
+    dplyr::count(value)%>%
+    dplyr::mutate(max = max(n))%>% 
+    dplyr::slice(which.max(n))%>% 
+    dplyr::ungroup()%>% 
+    dplyr::select(-n, -max) %>% tidyr::pivot_wider(names_from = variable, values_from = value)
+
+WD_summaries= dplyr::left_join(WD_summaries, WD_summaries_factor_vars, by = "FID_WD")  
+
 Irri_summaries = data_meaningful_cols %>% 
   dplyr::select(-FID_WD)%>%
   group_by(OBJECTID_IrriOrg)%>% 
@@ -76,6 +87,18 @@ Irri_summaries = data_meaningful_cols %>%
 Irri_summaries = dplyr::left_join(irrigation_districts_fid_geom_and_name,Irri_summaries, by = "OBJECTID_IrriOrg")%>%
   dplyr::select(OBJECTID_IrriOrg,NAME_IrriOrg, everything())%>% dplyr::arrange( -Prsstn_) 
 
+
+Irri_summaries_factor_vars = data_meaningful_cols %>% dplyr::select(OBJECTID_IrriOrg,IRRI_ST, Cr_2005, Cr_2007, Cr_2008, Cr_2009, Cr_2010, Cr_2011, Cr_2012, Cr_2013, Cr_2014, Cr_2015, Cr_2016, Cr_2017, Cr_2018, Cr_2019, Cr_2020, source, WR_class, RDR_classs)%>% reshape2::melt(id = "OBJECTID_IrriOrg")%>%  
+filter(!is.na(value)) %>%
+  group_by(OBJECTID_IrriOrg, variable)%>%
+    dplyr::count(value)%>%
+    dplyr::mutate(max = max(n))%>% 
+    dplyr::slice(which.max(n))%>% 
+    dplyr::ungroup()%>% 
+    dplyr::select(-n, -max) %>% tidyr::pivot_wider(names_from = variable, values_from = value)
+
+
+Irri_summaries= dplyr::left_join(Irri_summaries, Irri_summaries_factor_vars, by = "OBJECTID_IrriOrg")  
 
 ```
 
@@ -95,7 +118,9 @@ DT::datatable(WD_summaries,
                            fixedHeader = FALSE,
                            fillContainer = FALSE,
                            columnDefs = list(list(className = 'dt-left',
-                                                  width = '100%',visible=FALSE))),
+                                                  width = '100%',
+                                                  visible=FALSE,
+                                                  targets = c(36)))),
                rownames= FALSE)%>%
   DT::formatStyle(
     'Prsstn_',
@@ -127,7 +152,9 @@ DT::datatable(Irri_summaries,
                            fixedHeader = FALSE,
                            fillContainer = FALSE,
                            columnDefs = list(list(className = 'dt-left',
-                                                  width = '100%',visible=FALSE))),
+                                                  width = '100%',
+                                                  visible=FALSE,
+                                                  targets = c(35)))),
                rownames= FALSE)%>%
   DT::formatStyle(
     'Prsstn_',
